@@ -14,10 +14,11 @@ namespace WCompose
         public ComposeKeyboardHook()
         {
             //TODO: read from config and allow editing in UI
-            _map.Insert(new[] { '\'', 'e' }, "é");
-            _map.Insert(new[] { '\'', 'E' }, "É");
-            _map.Insert(new[] { '"', 'e' }, "ë");
-            _map.Insert(new[] { '"', 'E' }, "Ë");
+            _map.Insert("'e", "é");
+            _map.Insert("'E", "É");
+            _map.Insert("\"e", "ë");
+            _map.Insert("\"E", "Ë");
+            _map.Insert(">>>", "⋙");
         }
         
         [DllImport("user32.dll", CallingConvention = CallingConvention.StdCall)]
