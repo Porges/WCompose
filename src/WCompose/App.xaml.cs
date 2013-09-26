@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
@@ -14,9 +15,11 @@ namespace WCompose
     public partial class App : Application
     {
         private NotifyIcon _icon;
+        private ComposeKeyboardHook _hook;
         
         protected override void OnStartup(StartupEventArgs e)
         {
+
             _icon = new NotifyIcon
             {
                 Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location),
@@ -33,7 +36,19 @@ namespace WCompose
                 MainWindow.Activate();
             };
 
+            _hook = new ComposeKeyboardHook();
+
+            UpdateTrie(_hook);
+
             base.OnStartup(e);
+        }
+
+        async void UpdateTrie(ComposeKeyboardHook hook)
+        {
+            using (var reader = new StreamReader("Compose.pre.txt"))
+            {
+                hook.SetTrie(await new TrieBuilder().Build(reader));
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)

@@ -7,19 +7,10 @@ namespace WCompose
 {
     public class ComposeKeyboardHook : KeyboardHook
     {
-        private readonly Trie<char, string> _map = new Trie<char, string>();
+        private Trie<char, string> _map = new Trie<char, string>();
  
         private Trie<char, string> _current; 
 
-        public ComposeKeyboardHook()
-        {
-            //TODO: read from config and allow editing in UI
-            _map.Insert("'e", "é");
-            _map.Insert("'E", "É");
-            _map.Insert("\"e", "ë");
-            _map.Insert("\"E", "Ë");
-            _map.Insert(">>>", "⋙");
-        }
         
         [DllImport("user32.dll", CallingConvention = CallingConvention.StdCall)]
         static extern int ToUnicodeEx(
@@ -32,6 +23,7 @@ namespace WCompose
             UIntPtr dwhkl = default(UIntPtr)
             );
 
+        private readonly StringBuilder _keyBuffer = new StringBuilder(10);
         private readonly StringBuilder _buffer = new StringBuilder(10);
         private readonly byte[] _keyState = new byte[256];
         protected override bool TryHandle(EventType eventType, KBDLLHOOKSTRUCT keyCodes)
@@ -72,16 +64,26 @@ namespace WCompose
                         return false;
 
                     // navigate the trie
-                    for (int i = 0; i < numChars; ++i)
+                    for (int i = 0; i < numChars && _current != null; ++i)
                     {
                         _current = _current.Step(_buffer[i]);
+                        _keyBuffer.Append(_buffer[i]);
                     }
 
                     // if we have an end state, send it
                     if (_current != null && _current.Value != null)
                     {
-                        SendKeys.SendWait(_current.Value);
+                        var value = _current.Value;
+                        _keyBuffer.Clear();
                         _current = null;
+                        SendKeys.SendWait(EscapeSendKeys(value));
+                    }
+                        // if we failed to find a match just send all the keys
+                    else if (_current == null)
+                    {
+                        var value = _keyBuffer.ToString();
+                        _keyBuffer.Clear();
+                        SendKeys.SendWait(EscapeSendKeys(value));
                     }
                 }
 
@@ -90,6 +92,40 @@ namespace WCompose
             }
 
             return false;
+        }
+
+        private readonly StringBuilder sendKeysEscape = new StringBuilder(10);
+        private string EscapeSendKeys(string input)
+        {
+            sendKeysEscape.Clear();
+            foreach (var c in input)
+            {
+                switch (c)
+                {
+                    case '+':
+                    case '%':
+                    case '^':
+                    case '~':
+                    case '(':
+                    case ')':
+                    case '{':
+                    case '}':
+                    case '[':
+                    case ']':
+                        sendKeysEscape.Append('{').Append(c).Append('}');
+                        break;
+                    default:
+                        sendKeysEscape.Append(c);
+                        break;
+                }
+            }
+            return sendKeysEscape.ToString();
+        }
+
+        public void SetTrie(Trie<char, string> trie)
+        {
+            // reference assignment is threadsafe
+            _map = trie;
         }
     }
 }

@@ -9,25 +9,16 @@ namespace WCompose
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ComposeKeyboardHook _hook;
-
         public MainWindow()
         {
             InitializeComponent();
 
-            _hook = new ComposeKeyboardHook();
 
             Closing += (sender, args) =>
             {
                 args.Cancel = true;
                 Hide();
             };
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            _hook.Dispose();
-            base.OnClosing(e);
         }
 
         protected override void OnStateChanged(EventArgs e)
