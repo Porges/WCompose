@@ -1,6 +1,25 @@
-﻿<Window x:Class="WCompose.MainWindow"
+﻿<controls:MetroWindow x:Class="WCompose.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Label>WCompose. It's like XCompose but for Windows.</Label>
-</Window>
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        Title="WCompose Options"
+        SizeToContent="WidthAndHeight"
+        MinHeight="200"
+        MinWidth="300">
+    <controls:MetroAnimatedTabControl>
+        <TabItem Header="Keys">
+            <StackPanel>
+                <Button Content="Import XCompose file" />
+                <DataGrid>
+                    
+                </DataGrid>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Behavior">
+            <StackPanel>
+                <CheckBox Content="Show prompts" />
+                <CheckBox Content="Start when Windows starts up" />
+            </StackPanel>
+        </TabItem>
+    </controls:MetroAnimatedTabControl>
+</controls:MetroWindow>

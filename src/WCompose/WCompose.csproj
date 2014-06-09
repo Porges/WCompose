@@ -96,6 +96,9 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="Prompts.xaml.cs">
+      <DependentUpon>Prompts.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trie.cs" />
     <Compile Include="TrieBuilder.cs" />
     <Page Include="MainWindow.xaml">
@@ -112,6 +115,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Prompts.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

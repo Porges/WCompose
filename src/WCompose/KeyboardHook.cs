@@ -28,8 +28,7 @@ namespace WCompose
                 _proc = Proc;
 
                 var hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, _proc, GetModuleHandle(curModule.ModuleName), 0);
-                if (hookHandle.IsInvalid)
-                    throw new Win32Exception();
+                if (hookHandle.IsInvalid) throw new Win32Exception();
                 
                 _hook = hookHandle;
             }

@@ -56,5 +56,10 @@ namespace WCompose
             }
             return current;
         }
+
+        public IEnumerable<TKey> Keys
+        {
+            get { return _map.Keys; }
+        }
     }
 }

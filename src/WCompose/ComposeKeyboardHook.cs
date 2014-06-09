@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -9,9 +10,10 @@ namespace WCompose
     {
         private Trie<char, string> _map = new Trie<char, string>();
  
-        private Trie<char, string> _current; 
+        private Trie<char, string> _current;
 
-        
+        private Prompts _prompts = new Prompts();
+
         [DllImport("user32.dll", CallingConvention = CallingConvention.StdCall)]
         static extern int ToUnicodeEx(
             uint wVirtKey,
@@ -39,6 +41,8 @@ namespace WCompose
                     {
                         // start to compose!
                         _current = _map;
+                        _prompts.Show();
+                        _prompts.SetItems(_current.Keys.Select(x=>x.ToString()));
                     }
 
                     // ignore up-moves of the Apps key as well or else the menu still pops up    
@@ -52,7 +56,6 @@ namespace WCompose
                     _keyState[16] = eventType == EventType.KeyDown ? (byte)0x80 : (byte)0;
                     return false;
             }
-
 
             if (_current != null) // if we're composing
             {
@@ -76,18 +79,28 @@ namespace WCompose
                         var value = _current.Value;
                         _keyBuffer.Clear();
                         _current = null;
+                        _prompts.Hide();
                         SendKeys.SendWait(EscapeSendKeys(value));
                     }
-                        // if we failed to find a match just send all the keys
+                    // if we failed to find a match just send all the keys
                     else if (_current == null)
                     {
                         var value = _keyBuffer.ToString();
                         _keyBuffer.Clear();
+                        _prompts.Hide();
                         SendKeys.SendWait(EscapeSendKeys(value));
+                    }
+                    else
+                    {
+                        // otherwise we update the prompts
+                        if (_prompts.IsVisible)
+                        {
+                            _prompts.SetItems(_current.Keys.Select(x => x.ToString()));
+                        }
                     }
                 }
 
-                // never sent composed keys onwards
+                // never send composed keys onwards
                 return true;
             }
 

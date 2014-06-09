@@ -1,0 +1,15 @@
+﻿<controls:MetroWindow x:Class="WCompose.Prompts"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Prompts"
+        SizeToContent="WidthAndHeight"
+        MinWidth="200"
+        MinHeight="100"
+        ShowTitleBar="False"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Topmost="True"
+        ShowInTaskbar="False">
+    <ListView ItemsSource="{Binding Items}">
+    </ListView>
+</controls:MetroWindow>
