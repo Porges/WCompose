@@ -18,6 +18,9 @@ namespace WCompose
             
         }
 
+        private static readonly Regex _regex =
+            new Regex(@"^<Multi_key>(?:\s*<(?<inputs>[^>]+)>)+\s*:\s*""(?<output>[^""]+)""\s*(?<name>[^\s]+)", RegexOptions.Compiled);
+
         public async Task<Trie<char, string>> Build(TextReader reader)
         {
             var trie = new Trie<char, string>();
@@ -66,7 +69,7 @@ namespace WCompose
             {
                 if (line.Trim().Length == 0) continue;
 
-                var match = Regex.Match(line, @"^<Multi_key>(?:\s*<(?<inputs>[^>]+)>)+\s*:\s*""(?<output>[^""]+)""\s*(?<name>[^\s]+)");
+                var match = _regex.Match(line);
                 if (!match.Success)
                 {
                     //Trace.TraceWarning("Skipping line {0}", line);
@@ -81,18 +84,20 @@ namespace WCompose
             }
 
             //var unknownChars = new HashSet<string>();
-            var sb = new StringBuilder();
+            var buffer = new List<char>();
             foreach (var compose in xcomposes)
             {
-                sb.Clear();
+                buffer.Clear();
                 var success = true;
                 foreach (var input in compose.Item1)
                 {
                     if (input.Length == 1)
-                        sb.Append(input[0]);
+                    {
+                        buffer.Add(input[0]);
+                    }
                     else if (input[0] == 'U' && input.Substring(1).All(x => char.IsDigit(x) || x >= 'A' && x <= 'F' || x >= 'a' && x <= 'f'))
                     {
-                        sb.Append(char.ConvertFromUtf32(Convert.ToInt32(input.Substring(1), 16)));
+                        buffer.AddRange(char.ConvertFromUtf32(Convert.ToInt32(input.Substring(1), 16)));
                     }
                     else
                     {
@@ -103,15 +108,17 @@ namespace WCompose
                             success = false;
                             break;
                         }
-
-                        else sb.Append(mapped);
+                        else
+                        {
+                            buffer.AddRange(mapped);
+                        }
                     }
                 }
                
                 if (success)
                 {
                     //Trace.TraceInformation("Mapped '{0}' -> {1}", sb.ToString(), compose.Item2);
-                    trie.Insert(sb.ToString(), compose.Item2);
+                    trie.Insert(buffer, compose.Item2);
                 }
             }
 
