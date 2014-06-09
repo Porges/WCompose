@@ -19,28 +19,30 @@ namespace WCompose
         
         protected override void OnStartup(StartupEventArgs e)
         {
-
             _icon = new NotifyIcon
             {
                 Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location),
                 Visible = true,
                 ContextMenu = new ContextMenu(new[]
                 {
+                    new MenuItem("&Options", (sender, args) => ShowOptions()),
                     new MenuItem("E&xit", (sender, args) => Shutdown()),
                 }),
             };
 
-            _icon.Click += (sender, args) =>
-            {
-                MainWindow.Show();
-                MainWindow.Activate();
-            };
+            _icon.Click += (sender, args) => ShowOptions();
 
             _hook = new ComposeKeyboardHook();
 
             UpdateTrie(_hook);
 
             base.OnStartup(e);
+        }
+
+        private void ShowOptions()
+        {
+            MainWindow.Show();
+            MainWindow.Activate();
         }
 
         async void UpdateTrie(ComposeKeyboardHook hook)
@@ -55,6 +57,8 @@ namespace WCompose
         {
             _icon.Visible = false;
             _icon.Dispose();
+
+            _hook.Dispose();
 
             base.OnExit(e);
         }
