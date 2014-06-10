@@ -3,13 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Prompts"
         SizeToContent="WidthAndHeight"
-        MinWidth="200"
         MinHeight="100"
         ShowTitleBar="False"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Topmost="True"
-        ShowInTaskbar="False">
-    <ListView ItemsSource="{Binding Items}">
+        ShowInTaskbar="False" WindowStyle="ToolWindow">
+    <ListView ItemsSource="{Binding Items}" FontSize="18" HorizontalAlignment="Center" MinWidth="150" MaxWidth="200" Margin="5" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Path=.}" TextWrapping="Wrap"></TextBlock>
+            </DataTemplate>
+        </ListView.ItemTemplate>
     </ListView>
 </controls:MetroWindow>

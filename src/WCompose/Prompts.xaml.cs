@@ -33,7 +33,7 @@ namespace WCompose
             this.Left = desktopWorkingArea.Right - this.ActualWidth;
             this.Top = desktopWorkingArea.Bottom - this.ActualHeight;
         }
-
+        
         private readonly ObservableCollection<string> _items = new ObservableCollection<string>();
 
         public void SetItems(IEnumerable<string> items)

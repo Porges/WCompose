@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -42,7 +43,7 @@ namespace WCompose
                         // start to compose!
                         _current = _map;
                         _prompts.Show();
-                        _prompts.SetItems(_current.Keys.Select(x=>x.ToString()));
+                        UpdatePrompts();
                     }
 
                     // ignore up-moves of the Apps key as well or else the menu still pops up    
@@ -95,7 +96,7 @@ namespace WCompose
                         // otherwise we update the prompts
                         if (_prompts.IsVisible)
                         {
-                            _prompts.SetItems(_current.Keys.Select(x => x.ToString()));
+                            UpdatePrompts();
                         }
                     }
                 }
@@ -105,6 +106,32 @@ namespace WCompose
             }
 
             return false;
+        }
+
+        private void UpdatePrompts()
+        {
+            var result = new List<string>();
+            var others = new List<char>(); 
+
+            foreach (var key in _current.Keys)
+            {
+                var next = _current.Step(key);
+                if (next.Value != null)
+                {
+                    result.Add(key + " → " + next.Value);
+                }
+                else
+                {
+                    others.Add(key);
+                }
+            }
+
+            result.Sort();
+            others.Sort();
+
+            result.Add(" " + string.Join(" ", others));
+
+            _prompts.SetItems(result);
         }
 
         private readonly StringBuilder sendKeysEscape = new StringBuilder(10);
