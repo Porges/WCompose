@@ -7,7 +7,7 @@ namespace WCompose
     /// </summary>
     public class Trie<TKey, TValue>
     {
-        private readonly Dictionary<TKey, Trie<TKey, TValue>> _map = new Dictionary<TKey, Trie<TKey, TValue>>();
+        private Dictionary<TKey, Trie<TKey, TValue>> _map;
         private TValue _value;
         
         public void Insert(IEnumerable<TKey> key, TValue value)
@@ -46,6 +46,8 @@ namespace WCompose
             var current = this;
             foreach (var item in key)
             {
+                if (current._map == null) current._map = new Dictionary<TKey, Trie<TKey, TValue>>();
+
                 Trie<TKey, TValue> next;
                 if (!current._map.TryGetValue(item, out next))
                 {
