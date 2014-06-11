@@ -30,7 +30,7 @@ namespace WCompose
                           .Append(trie.Value)
                           .AppendLine("\"");
 
-                await writer.WriteLineAsync(lineBuffer.ToString());
+                await writer.WriteAsync(lineBuffer.ToString());
                 lineBuffer.Clear();
             }
             else
