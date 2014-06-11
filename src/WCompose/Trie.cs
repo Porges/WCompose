@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace WCompose
 {
@@ -34,6 +35,8 @@ namespace WCompose
 
         public Trie<TKey, TValue> Step(TKey key)
         {
+            if (_map == null) return null;
+
             Trie<TKey, TValue> result = null;
             _map.TryGetValue(key, out result);
             return result;
@@ -61,7 +64,12 @@ namespace WCompose
 
         public IEnumerable<TKey> Keys
         {
-            get { return _map.Keys; }
+            get
+            {
+                if (_map == null) return Enumerable.Empty<TKey>();
+
+                return _map.Keys;
+            }
         }
     }
 }

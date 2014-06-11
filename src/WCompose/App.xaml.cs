@@ -34,7 +34,7 @@ namespace WCompose
 
             _hook = new ComposeKeyboardHook();
 
-            UpdateTrie(_hook);
+            MainWindow = new MainWindow(_hook);
 
             base.OnStartup(e);
         }
@@ -42,15 +42,9 @@ namespace WCompose
         private void ShowOptions()
         {
             MainWindow.Show();
+            MainWindow.WindowState = WindowState.Normal;
+            MainWindow.BringIntoView();
             MainWindow.Activate();
-        }
-
-        async void UpdateTrie(ComposeKeyboardHook hook)
-        {
-            using (var reader = new StreamReader("Compose.pre.txt"))
-            {
-                hook.SetTrie(await new TrieBuilder().Build(reader));
-            }
         }
 
         protected override void OnExit(ExitEventArgs e)

@@ -9,7 +9,14 @@
     <controls:MetroAnimatedTabControl>
         <TabItem Header="Keys">
             <StackPanel>
-                <Button Content="Import XCompose file" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Import XCompose file" HorizontalAlignment="Center" Click="LoadXComposeFileClicked" Margin="2" Grid.Column="0"/>
+                    <Button Content="Export XCompose file" HorizontalAlignment="Center" Click="SaveXComposeFileClicked" Margin="2" Grid.Column="1"/>
+                </Grid>
                 <DataGrid>
                     
                 </DataGrid>

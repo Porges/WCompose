@@ -10,19 +10,51 @@ using System.Windows.Documents;
 
 namespace WCompose
 {
-    public class TrieBuilder
+    public class TrieWriter
     {
-        public TrieBuilder()
+        private StringBuilder keyBuffer = new StringBuilder();
+        private StringBuilder lineBuffer = new StringBuilder();
 
+        public Task Write(StreamWriter writer, Trie<char, string> trie)
         {
-            
+            return RecurseWrite(writer, trie);
         }
 
+        private async Task RecurseWrite(StreamWriter writer, Trie<char, string> trie)
+        {
+            if (trie.Value != null)
+            {
+                lineBuffer.Append("<Multi_key> ")
+                          .Append(keyBuffer)
+                          .Append(":\"")
+                          .Append(trie.Value)
+                          .AppendLine("\"");
+
+                await writer.WriteLineAsync(lineBuffer.ToString());
+                lineBuffer.Clear();
+            }
+            else
+            {
+                var len = keyBuffer.Length;
+                foreach (var c in trie.Keys)
+                {
+                    keyBuffer.Append('<').Append(c).Append("> ");
+                    await RecurseWrite(writer, trie.Step(c));
+                    keyBuffer.Length = len;
+                }
+            }
+        }
+    }
+
+    public class TrieBuilder
+    {
         private static readonly Regex _regex =
             new Regex(@"^<Multi_key>(?:\s*<(?<inputs>[^>]+)>)+\s*:\s*""(?<output>[^""]+)""\s*(?<name>[^\s]+)", RegexOptions.Compiled);
 
         public async Task<Trie<char, string>> Build(TextReader reader)
         {
+            await Task.Delay(0).ConfigureAwait(false); // get off UI thread, if we are
+
             var trie = new Trie<char, string>();
 
             var nameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

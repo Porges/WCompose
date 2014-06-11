@@ -161,11 +161,12 @@ namespace WCompose
             }
             return sendKeysEscape.ToString();
         }
-
-        public void SetTrie(Trie<char, string> trie)
+        
+        public Trie<char, string> Trie 
         {
             // reference assignment is threadsafe
-            _map = trie;
+            get { return _map; }
+            set { _map = value; }
         }
     }
 }
