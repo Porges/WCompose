@@ -94,6 +94,7 @@ namespace WCompose
                 {"asterisk", "*"},
                 {"percent", "%"},
             };
+
             var xcomposes = new List<Tuple<IEnumerable<string>, string>>();
 
             string line;

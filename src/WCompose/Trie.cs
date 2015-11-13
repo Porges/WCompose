@@ -9,13 +9,11 @@ namespace WCompose
     public class Trie<TKey, TValue>
     {
         private Dictionary<TKey, Trie<TKey, TValue>> _map;
-        private TValue _value;
         
         public void Insert(IEnumerable<TKey> key, TValue value)
         {
             var current = Locate(key, true);
-
-            current._value = value;
+            current.Value = value;
         }
 
         public bool TryGet(IEnumerable<TKey> key, out TValue value)
@@ -23,7 +21,7 @@ namespace WCompose
             var node = Locate(key, false);
             if (node != null)
             {
-                value = node._value;
+                value = node.Value;
                 return true;
             }
             else
@@ -42,7 +40,7 @@ namespace WCompose
             return result;
         }
 
-        public TValue Value { get { return _value; } }
+        public TValue Value { get; private set; }
 
         private Trie<TKey, TValue> Locate(IEnumerable<TKey> key, bool create)
         {
