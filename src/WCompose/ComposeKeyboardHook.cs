@@ -36,9 +36,9 @@ namespace WCompose
 
             switch ((Keys) keyCodes.vkCode)
             {
-                case Keys.Apps:
+                case Keys.RMenu:
                 {
-                    if (eventType == EventType.KeyDown)
+                    if (eventType == EventType.SysKeyDown)
                     {
                         // start to compose!
                         _current = _map;
