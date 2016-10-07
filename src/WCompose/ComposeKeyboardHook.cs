@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Windows.Forms;
 
@@ -15,16 +16,20 @@ namespace WCompose
 
         private Prompts _prompts = new Prompts();
 
-        [DllImport("user32.dll", CallingConvention = CallingConvention.StdCall)]
-        static extern int ToUnicodeEx(
-            uint wVirtKey,
-            uint wScanCode,
-            byte[] lpKeyState,
-            StringBuilder pwszBuff,
-            int cchBuff,
-            uint wFlags = 0,
-            UIntPtr dwhkl = default(UIntPtr)
-            );
+        [SuppressUnmanagedCodeSecurity]
+        private static class SafeNativeMethods
+        {
+            [DllImport("user32.dll", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
+            public static extern int ToUnicodeEx(
+                uint wVirtKey,
+                uint wScanCode,
+                byte[] lpKeyState,
+                StringBuilder pwszBuff,
+                int cchBuff,
+                uint wFlags = 0,
+                UIntPtr dwhkl = default(UIntPtr)
+                );
+        }
 
         private readonly StringBuilder _keyBuffer = new StringBuilder(10);
         private readonly StringBuilder _buffer = new StringBuilder(10);
@@ -63,7 +68,13 @@ namespace WCompose
                 if (eventType == EventType.KeyDown)
                 {
                     // try to convert the keystate to a character
-                    var numChars = ToUnicodeEx(keyCodes.vkCode, keyCodes.scanCode, _keyState, _buffer, _buffer.Capacity);
+                    var numChars = SafeNativeMethods.ToUnicodeEx(
+                        keyCodes.vkCode,
+                        keyCodes.scanCode,
+                        _keyState,
+                        _buffer,
+                        _buffer.Capacity);
+
                     if (numChars <= 0)
                         return false;
 

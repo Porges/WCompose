@@ -1,10 +1,8 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Navigation;
 using Application = System.Windows.Application;
 
 namespace WCompose
@@ -12,6 +10,8 @@ namespace WCompose
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "Disposal happens in OnExit method")]
     public partial class App : Application
     {
         private NotifyIcon _icon;

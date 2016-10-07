@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+using System.Security;
 
 namespace WCompose
 {
@@ -27,7 +28,13 @@ namespace WCompose
             {
                 _proc = Proc;
 
-                var hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, _proc, GetModuleHandle(curModule.ModuleName), 0);
+                var hookHandle = 
+                    SafeNativeMethods.SetWindowsHookEx(
+                        WH_KEYBOARD_LL,
+                        _proc,
+                        SafeNativeMethods.GetModuleHandle(curModule.ModuleName),
+                        0);
+
                 if (hookHandle.IsInvalid) throw new Win32Exception();
                 
                 _hook = hookHandle;
@@ -44,7 +51,7 @@ namespace WCompose
                 }
             }
 
-            return CallNextHookEx(_hook, nCode, wParam, ref lParam);
+            return SafeNativeMethods.CallNextHookEx(_hook, nCode, wParam, ref lParam);
         }
 
         [Flags]
@@ -59,9 +66,8 @@ namespace WCompose
             public uint scanCode;
             public KeyFlags flags;
             public uint time;
-            public UIntPtr extraInfo;
+            private UIntPtr extraInfo;
         }
-
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate IntPtr LowLevelKeyboardProc(
@@ -69,6 +75,33 @@ namespace WCompose
             UIntPtr wParam,
             ref KBDLLHOOKSTRUCT lParam
             );
+
+        [SuppressUnmanagedCodeSecurity]
+        private static class SafeNativeMethods
+        {
+            [DllImport("user32.dll", SetLastError = true)]
+            public static extern SafeHookHandle SetWindowsHookEx(
+                int idHook,
+                LowLevelKeyboardProc lpfn,
+                IntPtr hMod,
+                uint dwThreadId
+                );
+
+            [DllImport("user32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool UnhookWindowsHookEx(IntPtr handle);
+
+            [DllImport("user32.dll")]
+            public static extern IntPtr CallNextHookEx(
+                SafeHookHandle hhk,
+                int nCode,
+                UIntPtr wParam,
+                ref KBDLLHOOKSTRUCT lParam
+                );
+
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            public static extern IntPtr GetModuleHandle(string lpModuleName);
+        }
 
         private class SafeHookHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
@@ -78,40 +111,15 @@ namespace WCompose
 
             protected override bool ReleaseHandle()
             {
-                return UnhookWindowsHookEx(DangerousGetHandle());
+                return SafeNativeMethods.UnhookWindowsHookEx(DangerousGetHandle());
             }
         }
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern SafeHookHandle SetWindowsHookEx(
-            int idHook,
-            LowLevelKeyboardProc lpfn,
-            IntPtr hMod,
-            uint dwThreadId
-            );
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool UnhookWindowsHookEx(IntPtr handle);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr CallNextHookEx(
-            SafeHookHandle hhk,
-            int nCode,
-            UIntPtr wParam,
-            ref KBDLLHOOKSTRUCT lParam
-            );
-
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr GetModuleHandle(string lpModuleName);
 
         protected abstract bool TryHandle(EventType eventType, KBDLLHOOKSTRUCT keyCodes);
 
         public void Dispose()
         {
             Dispose(true);
-            GC.KeepAlive(_proc);
             GC.SuppressFinalize(this);
         }
 
@@ -122,6 +130,8 @@ namespace WCompose
                 using (_hook)
                 {
                 }
+                
+                GC.KeepAlive(_proc);
             }
         }
     }
