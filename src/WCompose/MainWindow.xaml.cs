@@ -38,49 +38,61 @@ namespace WCompose
             base.OnStateChanged(e);
         }
 
-        private async Task SaveXComposeFile(string file)
+        private Task SaveXComposeFile(string file)
         {
-            using (var writer = new StreamWriter(file))
-            {
-                await new TrieWriter().Write(writer, _hook.Trie);
-            }
+            throw new NotImplementedException();
         }
 
-        private async Task LoadXComposeFile(string file)
+        private async Task LoadSettingsFile(string file)
         {
-            using (var reader = new StreamReader(file))
-            {
-                _hook.Trie = await new TrieBuilder().Build(reader);
-            }
+            _hook.Trie = await new JsonTrieBuilder().Build(file);
         }
 
-        private string GetDefaultConfigFile()
+        private string GetUserSettingsPath()
         {
-            const string ConfigName = "WCompose.keys";
+            const string UserFile = "Mappings.json";
 
-            var directory = ApplicationDeployment.IsNetworkDeployed
+            var userDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(userDataDirectory, "WCompose", UserFile);
+        }
+
+        private static String GetDefaultSettingsPath()
+        {
+            const string DefaultFile = "DefaultMappings.json";
+
+            var appDirectory = ApplicationDeployment.IsNetworkDeployed
                 ? ApplicationDeployment.CurrentDeployment.DataDirectory
                 : Environment.CurrentDirectory;
-            
-            return Path.Combine(directory, ConfigName);;
+
+            return Path.Combine(appDirectory, DefaultFile);
         }
 
-        private async Task SaveConfig()
+        private string GetSettingsFile()
         {
-            using (var writer = new StreamWriter(GetDefaultConfigFile()))
+            var userPath = GetUserSettingsPath();
+            if (File.Exists(userPath))
             {
-                await new TrieWriter().Write(writer, _hook.Trie);
+                return userPath;
             }
+
+            return GetDefaultSettingsPath();
+        }
+
+        private Task SaveConfig()
+        {
+            throw new NotImplementedException();
         }
 
         private async void LoadConfig()
         {
             try
             {
-                await LoadXComposeFile(GetDefaultConfigFile());
+                await LoadSettingsFile(GetSettingsFile());
             }
-            catch (FileNotFoundException)
-            { }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error loading settings file", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void LoadXComposeFileClicked(object sender, RoutedEventArgs e)
@@ -95,7 +107,7 @@ namespace WCompose
             {
                 try
                 {
-                    await LoadXComposeFile(dialog.FileName);
+                    await LoadSettingsFile(dialog.FileName);
                     await SaveConfig();
                 }
                 catch (Exception ex)
