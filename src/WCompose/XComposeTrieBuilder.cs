@@ -18,7 +18,7 @@ namespace WCompose
             await Task.Delay(0).ConfigureAwait(false); // get off UI thread, if we are
 
             var trie = new Trie<char, string>();
-
+            
             var nameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
                 {"less", "<"},

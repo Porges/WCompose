@@ -1,53 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace WCompose
 {
     /// <summary>
     /// Interaction logic for Prompts.xaml
     /// </summary>
-    public partial class Prompts 
+    public partial class Prompts : INotifyPropertyChanged
     {
         public Prompts()
         {
             InitializeComponent();
 
-            SizeChanged += Prompts_SizeChanged;
+            SizeChanged += StickToBottomRight;
         }
 
-        void Prompts_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
+        void StickToBottomRight(object sender, SizeChangedEventArgs e)
+        { 
+            const int Margin = 5;
+
             var desktopWorkingArea = SystemParameters.WorkArea;
-            this.Left = desktopWorkingArea.Right - this.ActualWidth;
-            this.Top = desktopWorkingArea.Bottom - this.ActualHeight;
+            Left = desktopWorkingArea.Right - (ActualWidth + Margin);
+            Top = desktopWorkingArea.Bottom - (ActualHeight + Margin);
         }
         
-        private readonly ObservableCollection<string> _items = new ObservableCollection<string>();
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public void SetItems(IEnumerable<string> items)
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public void SetItems(IEnumerable<Tuple<string, string>> items)
         {
-            _items.Clear();
+            Items.Clear();
             foreach (var item in items)
             {
-                _items.Add(item);
+                Items.Add(item);
             }
         }
 
-        public ObservableCollection<string> Items
+        private string _currentInfo;
+
+        public string CurrentInfo
         {
-            get { return _items; }
+            get { return _currentInfo; }
+            set
+            {
+                _currentInfo = value;
+                RaisePropertyChanged();
+            }
         }
+        
+        public ObservableCollection<Tuple<string, string>> Items { get; } =
+            new ObservableCollection<Tuple<string, string>>();
     }
 }

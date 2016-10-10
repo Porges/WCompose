@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace WCompose
@@ -13,6 +14,7 @@ namespace WCompose
         public void Insert(IEnumerable<TKey> key, TValue value)
         {
             var current = Locate(key, true);
+            if (current.Value != null) throw new InvalidOperationException("Duplicate item");
             current.Value = value;
         }
 
@@ -69,5 +71,7 @@ namespace WCompose
                 return _map.Keys;
             }
         }
+        
+        public bool HasNext => _map?.Count > 0;
     }
 }

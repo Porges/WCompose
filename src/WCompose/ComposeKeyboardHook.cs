@@ -13,6 +13,7 @@ namespace WCompose
         private Trie<char, string> _map = new Trie<char, string>();
  
         private Trie<char, string> _current;
+        private string _lastMatch;
 
         private Prompts _prompts = new Prompts();
 
@@ -63,85 +64,92 @@ namespace WCompose
                     return false;
             }
 
-            if (_current != null) // if we're composing
+            if (_current == null)
             {
-                if (eventType == EventType.KeyDown)
+                // we're not composing
+                return false;
+            }
+            
+            if (eventType == EventType.KeyDown)
+            {
+                // try to convert the keystate to a character
+                var numChars = SafeNativeMethods.ToUnicodeEx(
+                    keyCodes.vkCode,
+                    keyCodes.scanCode,
+                    _keyState,
+                    _buffer,
+                    _buffer.Capacity);
+
+                if (numChars <= 0)
+                    return false;
+
+                // navigate the trie
+                for (int i = 0; i < numChars && _current != null; ++i)
                 {
-                    // try to convert the keystate to a character
-                    var numChars = SafeNativeMethods.ToUnicodeEx(
-                        keyCodes.vkCode,
-                        keyCodes.scanCode,
-                        _keyState,
-                        _buffer,
-                        _buffer.Capacity);
+                    _current = _current.Step(_buffer[i]);
+                    _keyBuffer.Append(_buffer[i]);
 
-                    if (numChars <= 0)
-                        return false;
-
-                    // navigate the trie
-                    for (int i = 0; i < numChars && _current != null; ++i)
+                    if (_current?.Value != null)
                     {
-                        _current = _current.Step(_buffer[i]);
-                        _keyBuffer.Append(_buffer[i]);
-                    }
-
-                    // if we have an end state, send it
-                    if (_current != null && _current.Value != null)
-                    {
-                        var value = _current.Value;
+                        _lastMatch = _current.Value;
                         _keyBuffer.Clear();
-                        _current = null;
-                        _prompts.Hide();
-                        SendKeys.SendWait(EscapeSendKeys(value));
-                    }
-                    // if we failed to find a match just send all the keys
-                    else if (_current == null)
-                    {
-                        var value = _keyBuffer.ToString();
-                        _keyBuffer.Clear();
-                        _prompts.Hide();
-                        SendKeys.SendWait(EscapeSendKeys(value));
-                    }
-                    else
-                    {
-                        // otherwise we update the prompts
-                        if (_prompts.IsVisible)
-                        {
-                            UpdatePrompts();
-                        }
                     }
                 }
 
-                // never send composed keys onwards
-                return true;
+                // if we have an end state, send it
+                if (_current != null && _current.Value != null && !_current.HasNext)
+                {
+                    _prompts.Hide();
+
+                    var value = _current.Value;
+                    _keyBuffer.Clear();
+                    _current = null;
+                    _lastMatch = null;
+                    SendKeys.SendWait(EscapeSendKeys(value));
+                }
+                // if we failed to find a match send any previous match and keys since then
+                else if (_current == null)
+                {
+                    _prompts.Hide();
+
+                    if (_lastMatch != null)
+                    {
+                        SendKeys.SendWait(EscapeSendKeys(_lastMatch));
+                        _lastMatch = null;
+                    }
+                    
+                    var value = _keyBuffer.ToString();
+                    _keyBuffer.Clear();
+                    
+                    SendKeys.SendWait(EscapeSendKeys(value));
+                }
+                else
+                {
+                    // otherwise we update the prompts
+                    if (_prompts.IsVisible)
+                    {
+                        UpdatePrompts();
+                    }
+                }
             }
 
-            return false;
+            // never send composed keys onwards
+            return true;
         }
 
         private void UpdatePrompts()
         {
-            var result = new List<string>();
-            var others = new List<char>(); 
+            var result = new List<Tuple<string, string>>();
 
             foreach (var key in _current.Keys)
             {
                 var next = _current.Step(key);
-                if (next.Value != null)
-                {
-                    result.Add(key + " → " + next.Value);
-                }
-                else
-                {
-                    others.Add(key);
-                }
+                result.Add(Tuple.Create(key.ToString(), next.Value));
             }
 
             result.Sort();
-            others.Sort();
-
-            result.Add(" " + string.Join(" ", others));
-
+            
+            _prompts.CurrentInfo = _lastMatch + _keyBuffer.ToString();
             _prompts.SetItems(result);
         }
 

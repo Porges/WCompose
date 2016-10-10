@@ -3,17 +3,63 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Prompts"
         SizeToContent="WidthAndHeight"
-        MinHeight="100"
         ShowTitleBar="False"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Topmost="True"
-        ShowInTaskbar="False" WindowStyle="ToolWindow">
-    <ListView ItemsSource="{Binding Items}" FontSize="18" HorizontalAlignment="Center" MinWidth="150" MaxWidth="200" Margin="5" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-        <ListView.ItemTemplate>
-            <DataTemplate>
-                <TextBlock Text="{Binding Path=.}" TextWrapping="Wrap"></TextBlock>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+        ShowInTaskbar="False"
+        WindowStyle="ToolWindow"
+        Background="Gray"
+        Foreground="White"
+        BorderBrush="DarkGray"
+        BorderThickness="1">
+    <StackPanel
+        HorizontalAlignment="Center"
+        MinWidth="150">
+        <TextBlock
+            Background="DimGray"
+            TextAlignment="Center"
+            FontSize="22"
+            Text="{Binding Path=CurrentInfo, UpdateSourceTrigger=PropertyChanged}"
+            Foreground="LightGray" />
+        <ListView
+            ItemsSource="{Binding Path=Items}"
+            BorderThickness="0"
+            FontSize="18"
+            Background="Transparent"
+            HorizontalAlignment="Center"
+            Margin="3"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel
+                        MaxHeight="300"
+                        Orientation="Vertical"
+                        HorizontalAlignment="Center" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Width="40"
+                            Background="Transparent"
+                            Foreground="White"
+                            Text="{Binding Item1}"
+                            TextWrapping="Wrap"
+                            HorizontalAlignment="Right"
+                            TextAlignment="Right" />
+                        <TextBlock Background="Transparent" Foreground="DarkGray" Text=" → " />
+                        <TextBlock
+                            Width="40"
+                            Background="Transparent"
+                            Foreground="White"
+                            Text="{Binding Item2}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackPanel>
 </controls:MetroWindow>
