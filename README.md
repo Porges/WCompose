@@ -6,6 +6,7 @@ Like XCompose, but for Windows™. Hit <kbd>Right Alt</kbd> to start composing!
 Install from [here](https://wcompose.blob.core.windows.net/beta/WCompose.application). (NB: ʙᴇᴛᴀ βετα ʙᴇᴛᴀ)
 
 Here’s what it looks like in action:
+
 ![WCompose in action](https://wcompose.blob.core.windows.net/beta/wcompose.png)
 
 
