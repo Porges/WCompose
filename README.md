@@ -3,10 +3,9 @@ WCompose [![Build status](https://ci.appveyor.com/api/projects/status/0epfncng3b
 
 Like XCompose for Windows. Hit <kbd>Right Alt</kbd> to start composing!
 
+Install from [here](https://wcompose.blob.core.windows.net/beta/WCompose.application).
 
-Install from: https://wcompose.blob.core.windows.net/beta/WCompose.application
-
-
+[![WCompose in action](https://wcompose.blob.core.windows.net/beta/wcompose.png)]
 
 
 
