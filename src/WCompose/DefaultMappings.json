@@ -329,8 +329,8 @@
     "gl": "λ", // Lambda
     "gm": "μ", // Mu
     "gn": "ν", // Nu
-    "gomi": "ο", // OMIcron
-    "gome": "ω", // OMEga
+    "goi": "ο", // OmIcron
+    "goe": "ω", // OmEga
     "gp": "π", // Pi
     "gps": "ψ", // PSi
     "gph": "φ", // PHi
@@ -355,8 +355,8 @@
     "gL": "Λ",
     "gM": "Μ",
     "gN": "Ν",
-    "gOMI": "Ο",
-    "gOME": "Ω",
+    "gOI": "Ο",
+    "gOE": "Ω",
     "gP": "Π",
     "gPS": "Ψ",
     "gPH": "Φ",
