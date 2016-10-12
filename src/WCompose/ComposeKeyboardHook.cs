@@ -13,7 +13,6 @@ namespace WCompose
         private Trie<char, string> _map = new Trie<char, string>();
  
         private Trie<char, string> _current;
-        private string _lastMatch;
 
         private Prompts _prompts = new Prompts();
 
@@ -42,26 +41,25 @@ namespace WCompose
 
             switch ((Keys) keyCodes.vkCode)
             {
-                case Keys.RMenu:
+            case Keys.RMenu:
+            {
+                if (eventType == EventType.SysKeyDown)
                 {
-                    if (eventType == EventType.SysKeyDown)
-                    {
-                        // start to compose!
-                        _current = _map;
-                        _prompts.Show();
-                        UpdatePrompts();
-                    }
-
-                    // ignore up-moves of the Apps key as well or else the menu still pops up    
-                    return true;
+                    // start to compose!
+                    _current = _map;
+                    UpdatePrompts();
+                    _prompts.Show();
                 }
-                case Keys.ShiftKey:
-                case Keys.Shift:
-                case Keys.LShiftKey:
-                case Keys.RShiftKey:
-                    // we have to maintain this ourselves as GetKeyboardState doesn't work in this situation
-                    _keyState[16] = eventType == EventType.KeyDown ? (byte)0x80 : (byte)0;
-                    return false;
+
+                return true; // consumed the key
+            }
+            case Keys.ShiftKey:
+            case Keys.Shift:
+            case Keys.LShiftKey:
+            case Keys.RShiftKey:
+                // we have to maintain this ourselves as GetKeyboardState doesn't work in this situation
+                _keyState[16] = eventType == EventType.KeyDown ? (byte)0x80 : (byte)0;
+                return false;
             }
 
             if (_current == null)
@@ -91,8 +89,8 @@ namespace WCompose
 
                     if (_current?.Value != null)
                     {
-                        _lastMatch = _current.Value;
                         _keyBuffer.Clear();
+                        _keyBuffer.Append(_current.Value);
                     }
                 }
 
@@ -104,20 +102,13 @@ namespace WCompose
                     var value = _current.Value;
                     _keyBuffer.Clear();
                     _current = null;
-                    _lastMatch = null;
                     SendKeys.SendWait(EscapeSendKeys(value));
                 }
                 // if we failed to find a match send any previous match and keys since then
                 else if (_current == null)
                 {
                     _prompts.Hide();
-
-                    if (_lastMatch != null)
-                    {
-                        SendKeys.SendWait(EscapeSendKeys(_lastMatch));
-                        _lastMatch = null;
-                    }
-                    
+                                       
                     var value = _keyBuffer.ToString();
                     _keyBuffer.Clear();
                     
@@ -149,7 +140,7 @@ namespace WCompose
 
             result.Sort();
             
-            _prompts.CurrentInfo = _lastMatch + _keyBuffer.ToString();
+            _prompts.CurrentInfo = _keyBuffer.ToString();
             _prompts.SetItems(result);
         }
 

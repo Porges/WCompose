@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
@@ -37,15 +38,12 @@ namespace WCompose
                 Text = $"WCompose {assemblyVersion}",
                 ContextMenu = new ContextMenu(new[]
                 {
-                    //new MenuItem("&Options", (sender, args) => ShowOptions()),
                     _startOnStartupMenuItem,            
                     new MenuItem("-"),
                     new MenuItem("E&xit", (sender, args) => Shutdown()),
                 }),
             };
-
-            //_icon.Click += (sender, args) => ShowOptions();
-
+            
             _hook = new ComposeKeyboardHook();
 
             MainWindow = new MainWindow(_hook);
@@ -58,11 +56,32 @@ namespace WCompose
 
         private RegistryKey OpenRunKey(bool writable) => Registry.CurrentUser.OpenSubKey(RunKey, writable);
 
+        private static readonly string StartupPath =
+            "\"" +
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.StartMenu),
+                    "Programs",
+                    "WCompose",
+                    "WCompose.appref-ms")
+            + "\"";
+
         private bool GetStartOnStartup()
         {
-            using (var key = OpenRunKey(false))
+            using (var key = OpenRunKey(true))
             {
-                return key.GetValue(ValueName) != null;
+                var path = key.GetValue(ValueName);
+                if (path == null)
+                {
+                    return false;
+                }
+                
+                // check if path needs updating
+                if (path as string != StartupPath)
+                {
+                    key.SetValue(ValueName, StartupPath);
+                }
+
+                return true;
             }
         }
 
@@ -77,9 +96,7 @@ namespace WCompose
                 }
                 else
                 {
-                    // TODO: not done
-                    var startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
-                    key.SetValue(ValueName, startupPath);
+                    key.SetValue(ValueName, StartupPath);
                 }
 
                 _startOnStartupMenuItem.Checked = !enabled;

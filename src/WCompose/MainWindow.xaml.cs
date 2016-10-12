@@ -60,9 +60,7 @@ namespace WCompose
         {
             const string DefaultFile = "DefaultMappings.json";
 
-            var appDirectory = ApplicationDeployment.IsNetworkDeployed
-                ? ApplicationDeployment.CurrentDeployment.DataDirectory
-                : Environment.CurrentDirectory;
+            var appDirectory = Environment.CurrentDirectory;
 
             return Path.Combine(appDirectory, DefaultFile);
         }

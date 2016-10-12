@@ -18,11 +18,12 @@ namespace WCompose
         {
             if (trie.Value != null)
             {
-                lineBuffer.Append("<Multi_key> ")
-                          .Append(keyBuffer)
-                          .Append(":\"")
-                          .Append(trie.Value)
-                          .AppendLine("\"");
+                lineBuffer
+                    .Append("<Multi_key> ")
+                    .Append(keyBuffer)
+                    .Append(":\"")
+                    .Append(trie.Value)
+                    .AppendLine("\"");
 
                 await writer.WriteAsync(lineBuffer.ToString());
                 lineBuffer.Clear();

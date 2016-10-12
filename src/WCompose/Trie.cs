@@ -67,8 +67,7 @@ namespace WCompose
             get
             {
                 if (_map == null) return Enumerable.Empty<TKey>();
-
-                return _map.Keys;
+               return _map.Keys;
             }
         }
         
