@@ -17,6 +17,8 @@
     "  ": " ", // NBSP
     "--": "–", // en-dash
     "---": "—", // em-dash
+    "...": "…",
+    "-...": "⋯",
 
     // Ligatures or other letters
     "ae": "æ",
