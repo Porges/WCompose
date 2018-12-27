@@ -49,9 +49,13 @@ namespace WCompose
                     _current = _map;
                     UpdatePrompts();
                     _prompts.Show();
-                }
 
-                return true; // consumed the key
+                    return true; // consumed the key
+                }
+                else
+                {
+                    return false; // pass through key-up events for Alt, so it doesn't get stuck down
+                }
             }
             case Keys.ShiftKey:
             case Keys.Shift:
