@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WCompose
@@ -41,17 +42,31 @@ namespace WCompose
 
             switch ((Keys) keyCodes.vkCode)
             {
-            case Keys.RMenu:
+            case Keys.RMenu: // Right Alt key
             {
                 if (eventType == EventType.SysKeyDown)
                 {
                     // start to compose!
                     _current = _map;
-                    UpdatePrompts();
-                    _prompts.Show();
-                }
 
-                return true; // consumed the key
+                    // TODO: can we start this on background thread?
+                    // as it seems it can block for a while if we've been paged out,
+                    // and we get messed up
+                    {
+                        UpdatePrompts();
+                        _prompts.Show();
+                    }
+
+                    // consumed the key
+                    return true;
+                }
+                else
+                {
+                    // allow key-up events through
+                    // this allows us to reset after we hang for a bit
+                    // which can happen if we're paged out...
+                    return false;
+                }
             }
             case Keys.ShiftKey:
             case Keys.Shift:
