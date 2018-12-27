@@ -7,9 +7,6 @@ using System.Windows;
 
 namespace WCompose
 {
-    /// <summary>
-    /// Interaction logic for Prompts.xaml
-    /// </summary>
     public partial class Prompts : INotifyPropertyChanged
     {
         public Prompts()

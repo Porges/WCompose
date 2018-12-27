@@ -4,10 +4,10 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>WComposeCore</AssemblyName>
+    <RootNamespace>WCompose</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Features>strict</Features>
     <ApplicationIcon>wet-cleaning.ico</ApplicationIcon>
-    <RootNamespace>WCompose</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="DefaultMappings.json" />

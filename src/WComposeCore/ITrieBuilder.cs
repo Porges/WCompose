@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace WCompose
 {
 
     internal interface ITrieBuilder
     {
-        Task<Trie<char, string>> Build(string path);
+        Task<Trie<char, string>> Build(TextReader input);
     }
 }

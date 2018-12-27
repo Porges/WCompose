@@ -9,10 +9,10 @@ namespace WCompose
 {
     internal class SettingsConverter : JsonConverter
     {
-        public override Boolean CanConvert(Type objectType) =>
+        public override bool CanConvert(Type objectType) =>
             typeof(Settings).IsAssignableFrom(objectType);
 
-        public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var obj = JObject.Load(reader);
             var version = obj.Value<string>("version");
@@ -27,7 +27,7 @@ namespace WCompose
             throw new InvalidDataException($"Unknown version: {version}");
         }
 
-        public override void WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotSupportedException();
         }
@@ -46,7 +46,7 @@ namespace WCompose
     
         public Dictionary<string, string> Mappings { get; } = new Dictionary<string, string>();
 
-        public override Trie<Char, String> BuildTrie()
+        public override Trie<char, string> BuildTrie()
         {
             var result = new Trie<char, string>();
             foreach (var mapping in Mappings)
@@ -65,18 +65,15 @@ namespace WCompose
             public string Version { get; }
         }
 
-        private async Task<Settings> ParseFile(string path)
+        private async Task<Settings> ParseFile(TextReader file)
         {
-            using (var file = File.OpenText(path))
-            {
-                var text = await file.ReadToEndAsync();
-                return JsonConvert.DeserializeObject<Settings>(text, new SettingsConverter());
-            }
+            var text = await file.ReadToEndAsync();
+            return JsonConvert.DeserializeObject<Settings>(text, new SettingsConverter());
         }
          
-        public async Task<Trie<Char, String>> Build(string path)
+        public async Task<Trie<char, string>> Build(TextReader input)
         {
-            var settings = await ParseFile(path);
+            var settings = await ParseFile(input);
                 
             return settings.BuildTrie();
         }

@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using Application = System.Windows.Application;
@@ -46,9 +47,59 @@ namespace WCompose
             
             _hook = new ComposeKeyboardHook();
 
-            MainWindow = new MainWindow(_hook);
+            // load in background, not on UI thread
+            Task.Run(() => LoadConfigFile(_hook));
 
             base.OnStartup(e);
+        }
+
+        private static async Task LoadSettingsFile(TextReader file, ComposeKeyboardHook hook)
+        {
+            hook.Trie = await new JsonTrieBuilder().Build(file);
+        }
+
+        private static string GetUserSettingsPath()
+        {
+            const string UserFile = "Mappings.json";
+
+            var userDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(userDataDirectory, "WCompose", UserFile);
+        }
+
+        private static string GetDefaultSettingsPath()
+        {
+            const string DefaultFile = "DefaultMappings.json";
+
+            var appDirectory = Environment.CurrentDirectory;
+
+            return Path.Combine(appDirectory, DefaultFile);
+        }
+
+        private static TextReader OpenSettingsFile()
+        {
+            try
+            {
+                return new StreamReader(GetUserSettingsPath());
+            }
+            catch (Exception ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException)
+            {
+                return new StreamReader(GetDefaultSettingsPath());
+            }
+        }
+
+        private static async Task LoadConfigFile(ComposeKeyboardHook hook)
+        {
+            try
+            {
+                using (var fs = OpenSettingsFile())
+                {
+                    await LoadSettingsFile(fs, hook);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error loading settings file", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         const string RunKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
@@ -101,14 +152,6 @@ namespace WCompose
 
                 _startOnStartupMenuItem.Checked = !enabled;
             }
-        }
-
-        private void ShowOptions()
-        {
-            MainWindow.Show();
-            MainWindow.WindowState = WindowState.Normal;
-            MainWindow.BringIntoView();
-            MainWindow.Activate();
         }
 
         protected override void OnExit(ExitEventArgs e)

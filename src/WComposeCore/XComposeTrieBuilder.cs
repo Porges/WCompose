@@ -13,10 +13,8 @@ namespace WCompose
         private static readonly Regex _regex =
             new Regex(@"^<Multi_key>(?:\s*<(?<inputs>[^>]+)>)+\s*:\s*""(?<output>[^""]+)""\s*(?<name>[^\s]+)", RegexOptions.Compiled);
 
-        private async Task<Trie<char, string>> Build(TextReader reader)
+        public async Task<Trie<char, string>> Build(TextReader reader)
         {
-            await Task.Delay(0).ConfigureAwait(false); // get off UI thread, if we are
-
             var trie = new Trie<char, string>();
             
             var nameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -123,14 +121,6 @@ namespace WCompose
             //}
 
             return trie;
-        }
-
-        public async Task<Trie<Char, String>> Build(String path)
-        {
-            using (var input = File.OpenText(path))
-            {
-                return await Build(input);
-            }
         }
     }
 }
