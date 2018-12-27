@@ -256,6 +256,11 @@
     "<<": "«",
     ">>": "»",
 
+    // Modifiers
+    "^,": "ʻ", // turned comma, AKA Okina
+    "^[": "ʿ", // left half ring, AKA Ayin
+    "^]": "ʾ", // right half ring, AKA Alef/Hamza
+
     // Superscripts
     "^0": "⁰",
     "^1": "¹",
