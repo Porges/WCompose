@@ -1,5 +1,14 @@
-WCompose [![Build status](https://ci.appveyor.com/api/projects/status/0epfncng3b4i4d8c?svg=true)](https://ci.appveyor.com/project/Porges/wcompose)
-========
+Archived
+======
+
+This was a fun experiment, but if you want to use something like this you should probably look at [WinCompose](https://github.com/samhocevar/wincompose).
+
+
+
+----
+
+
+#### WCompose [![Build status](https://ci.appveyor.com/api/projects/status/0epfncng3b4i4d8c?svg=true)](https://ci.appveyor.com/project/Porges/wcompose)
 
 Like XCompose, but for Windows™. Hit <kbd>Right Alt</kbd> to start composing!
 
@@ -10,7 +19,6 @@ Here’s what it looks like in action. The user has pressed `'`, and WCompose is
 ![WCompose in action](https://wcompose.blob.core.windows.net/beta/wcompose.png)
 
 
-Attributions
-------------
+#### Attributions
 
 * Icon by Freepik from www.flaticon.com 
